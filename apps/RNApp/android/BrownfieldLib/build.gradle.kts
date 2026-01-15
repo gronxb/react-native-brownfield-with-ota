@@ -125,4 +125,5 @@ dependencies {
     androidTestImplementation("androidx.test.espresso:espresso-core:3.7.0")
     api("com.facebook.react:react-android:0.82.1")
     api("com.facebook.react:hermes-android:0.82.1")
+    implementation("org.brotli:dec:0.1.2")
 }

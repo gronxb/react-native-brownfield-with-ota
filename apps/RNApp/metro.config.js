@@ -1,16 +1,12 @@
-const { getDefaultConfig, mergeConfig } = require('@react-native/metro-config');
+const {makeMetroConfig} = require('@rnx-kit/metro-config');
+const MetroSymlinksResolver = require('@rnx-kit/metro-resolver-symlinks');
 const path = require('path');
 
 const root = path.resolve(__dirname, '..', '..');
 
-/**
- * Metro configuration
- * https://reactnative.dev/docs/metro
- *
- * @type {import('@react-native/metro-config').MetroConfig}
- */
-const config = {
+module.exports = makeMetroConfig({
   watchFolders: [root],
-};
-
-module.exports = mergeConfig(getDefaultConfig(__dirname), config);
+  resolver: {
+    resolveRequest: MetroSymlinksResolver(),
+  },
+});

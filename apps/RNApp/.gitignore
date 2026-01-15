@@ -77,3 +77,14 @@ yarn-error.log
 # Brownfield
 android/BrownfieldLib/libsDebug/
 android/BrownfieldLib/libsRelease/
+
+# Hot-updater artifacts
+.hot-updater/
+.hot-updater/output/
+.env.hotupdater
+keys/
+# hot-updater
+.hot-updater/output
+
+
+dist

@@ -1,11 +1,12 @@
 import React, { useEffect } from 'react';
-import { StyleSheet, Text, View, Button } from 'react-native';
+import { StyleSheet, Text, View, Button, Alert } from 'react-native';
 import {
   createNativeStackNavigator,
   type NativeStackScreenProps,
 } from '@react-navigation/native-stack';
 import ReactNativeBrownfield from '@callstack/react-native-brownfield';
 import { NavigationContainer } from '@react-navigation/native';
+import { HotUpdater } from '@hot-updater/react-native';
 
 const getRandomValue = () => Math.round(Math.random() * 255);
 const getRandomTheme = () => {
@@ -38,7 +39,10 @@ function HomeScreen({ navigation, route }: Props) {
   return (
     <View style={[styles.container, { backgroundColor: colors.primary }]}>
       <Text style={[styles.text, { color: colors.secondary }]}>
-        React Native Screen
+        Hot Updater
+      </Text>
+      <Text style={[styles.text, { color: colors.secondary }]}>
+        Brownfield
       </Text>
 
       <Button
@@ -62,6 +66,16 @@ function HomeScreen({ navigation, route }: Props) {
         color={colors.secondary}
         title="Go back"
       />
+
+      <Button
+        onPress={() => {
+          HotUpdater.reload();
+        }}
+        color={colors.secondary}
+        title="Reload"
+      />
+
+      <Text>Hello {HotUpdater.getBundleId()}</Text>
     </View>
   );
 }
@@ -71,7 +85,7 @@ type RootStackParamList = {
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
-export default function App() {
+function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator>
@@ -80,6 +94,43 @@ export default function App() {
     </NavigationContainer>
   );
 }
+
+export default HotUpdater.wrap({
+  baseURL: "http://localhost:3006/hot-updater",
+  updateStrategy: "appVersion",
+  updateMode: "auto",
+  onNotifyAppReady: (result) => {
+    console.log('Hot-updater status:', result.status);
+    if (result.crashedBundleId) {
+      console.log('Crashed bundle ID:', result.crashedBundleId);
+    }
+  },
+  fallbackComponent: ({ progress, status }) => (
+    <View
+      style={{
+        flex: 1,
+        padding: 20,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+      }}
+    >
+      <Text style={{ color: 'white', fontSize: 20, fontWeight: 'bold' }}>
+        {status === "UPDATING" ? "Updating..." : "Checking for Update..."}
+      </Text>
+      {progress > 0 ? (
+        <Text style={{ color: 'white', fontSize: 20, fontWeight: 'bold' }}>
+          {Math.round(progress * 100)}%
+        </Text>
+      ) : null}
+    </View>
+  ),
+  onError: (error) => {
+    if (error instanceof Error) {
+      Alert.alert("Update Error", error.message);
+    }
+  },
+})(App);
 
 const styles = StyleSheet.create({
   container: {
