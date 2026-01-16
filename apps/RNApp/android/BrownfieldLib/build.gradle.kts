@@ -125,5 +125,11 @@ dependencies {
     androidTestImplementation("androidx.test.espresso:espresso-core:3.7.0")
     api("com.facebook.react:react-android:0.82.1")
     api("com.facebook.react:hermes-android:0.82.1")
+
+    // Hot-updater required dependencies
     implementation("org.brotli:dec:0.1.2")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
 }

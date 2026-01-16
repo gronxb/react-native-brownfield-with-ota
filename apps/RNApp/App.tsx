@@ -39,7 +39,7 @@ function HomeScreen({ navigation, route }: Props) {
   return (
     <View style={[styles.container, { backgroundColor: colors.primary }]}>
       <Text style={[styles.text, { color: colors.secondary }]}>
-        Hot Updater
+        Hot Updater 2
       </Text>
       <Text style={[styles.text, { color: colors.secondary }]}>
         Brownfield

@@ -11,9 +11,8 @@ object ReactNativeHostManager {
     fun initialize(application: Application, onJSBundleLoaded: OnJSBundleLoaded? = null) {
         loadReactNative(application)
 
-        // Get JS bundle file from HotUpdater and remove "assets://" prefix
-        val jsBundlePath = HotUpdater.getJSBundleFile(application)
-            .removePrefix("assets://")
+        // Get current bundle path from HotUpdater (supports both assets and file paths)
+        val jsBundlePath = HotUpdater.getJSBundleFile(application).removePrefix("assets://")
 
         val packageList = PackageList(application).packages
         val options = hashMapOf<String, Any>(
@@ -28,5 +27,9 @@ object ReactNativeHostManager {
             HotUpdater.setReactHost(ReactNativeBrownfield.shared.reactHost)
             onJSBundleLoaded?.invoke(initialized)
         }
+    }
+
+    fun destroy() {
+        HotUpdater.clearReactHost()
     }
 }
