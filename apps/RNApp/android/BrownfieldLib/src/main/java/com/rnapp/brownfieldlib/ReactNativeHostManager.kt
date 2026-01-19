@@ -6,6 +6,7 @@ import com.callstack.reactnativebrownfield.ReactNativeBrownfield
 import com.facebook.react.PackageList
 import com.facebook.react.ReactNativeApplicationEntryPoint.loadReactNative
 import com.hotupdater.HotUpdater
+import com.rnapp.brownfieldlib.BuildConfig
 
 object ReactNativeHostManager {
     fun initialize(application: Application, onJSBundleLoaded: OnJSBundleLoaded? = null) {
@@ -16,7 +17,7 @@ object ReactNativeHostManager {
             "packages" to packageList,
             "mainModuleName" to "index",
             "bundleFilePath" to HotUpdater.getJSBundleFile(application),
-            "useDeveloperSupport" to false
+            "useDeveloperSupport" to BuildConfig.DEBUG
         )
 
         ReactNativeBrownfield.initialize(application, options) { initialized ->
