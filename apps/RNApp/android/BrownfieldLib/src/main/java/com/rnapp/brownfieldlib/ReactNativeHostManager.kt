@@ -11,14 +11,12 @@ object ReactNativeHostManager {
     fun initialize(application: Application, onJSBundleLoaded: OnJSBundleLoaded? = null) {
         loadReactNative(application)
 
-        // Get current bundle path from HotUpdater (supports both assets and file paths)
-        val jsBundlePath = HotUpdater.getJSBundleFile(application).removePrefix("assets://")
-
         val packageList = PackageList(application).packages
         val options = hashMapOf<String, Any>(
             "packages" to packageList,
             "mainModuleName" to "index",
-            "bundleAssetPath" to jsBundlePath,
+            "bundleAssetPath" to null,
+            "bundleFilePath" to HotUpdater.getJSBundleFile(application),
             "useDeveloperSupport" to false
         )
 
