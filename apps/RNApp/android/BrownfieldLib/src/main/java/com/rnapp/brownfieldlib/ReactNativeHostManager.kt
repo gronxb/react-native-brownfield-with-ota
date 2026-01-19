@@ -15,7 +15,6 @@ object ReactNativeHostManager {
         val options = hashMapOf<String, Any>(
             "packages" to packageList,
             "mainModuleName" to "index",
-            "bundleAssetPath" to null,
             "bundleFilePath" to HotUpdater.getJSBundleFile(application),
             "useDeveloperSupport" to false
         )
