@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { StyleSheet, Text, View, Button, Alert } from 'react-native';
 import {
   createNativeStackNavigator,
@@ -41,9 +41,7 @@ function HomeScreen({ navigation, route }: Props) {
       <Text style={[styles.text, { color: colors.secondary }]}>
         Hot Updater 2
       </Text>
-      <Text style={[styles.text, { color: colors.secondary }]}>
-        Brownfield
-      </Text>
+      <Text style={[styles.text, { color: colors.secondary }]}>Brownfield</Text>
 
       <Button
         onPress={() => {
@@ -96,9 +94,9 @@ function App() {
 }
 
 export default HotUpdater.wrap({
-  baseURL: "http://localhost:3006/hot-updater",
-  updateStrategy: "appVersion",
-  updateMode: "auto",
+  baseURL: 'http://localhost:3006/hot-updater',
+  updateStrategy: 'appVersion',
+  updateMode: 'auto',
   onNotifyAppReady: (result) => {
     console.log('Hot-updater status:', result.status);
     if (result.crashedBundleId) {
@@ -116,7 +114,7 @@ export default HotUpdater.wrap({
       }}
     >
       <Text style={{ color: 'white', fontSize: 20, fontWeight: 'bold' }}>
-        {status === "UPDATING" ? "Updating..." : "Checking for Update..."}
+        {status === 'UPDATING' ? 'Updating...' : 'Checking for Update...'}
       </Text>
       {progress > 0 ? (
         <Text style={{ color: 'white', fontSize: 20, fontWeight: 'bold' }}>
@@ -127,7 +125,7 @@ export default HotUpdater.wrap({
   ),
   onError: (error) => {
     if (error instanceof Error) {
-      Alert.alert("Update Error", error.message);
+      Alert.alert('Update Error', error.message);
     }
   },
 })(App);

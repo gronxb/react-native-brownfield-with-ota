@@ -11,26 +11,37 @@ export interface BrownieStore {}
 
 type StoreListener = () => void;
 
+type HostObject = any;
+
 interface StoreCache {
-  hostObject: any;
+  hostObject: HostObject;
   snapshot: Record<string, unknown>;
   listeners: Set<StoreListener>;
 }
 
 const stores = new Map<string, StoreCache>();
 
-function getHostObject(key: string): any {
-  // @ts-ignore
-  return global.__getStore?.(key);
+function getHostObject(key: string): HostObject {
+  // @ts-expect-error - untyped global prop set by BrownieInstaller.cpp
+  return global.__brownieGetStore?.(key);
 }
 
 function getOrCreateStore(key: string): StoreCache {
   let store = stores.get(key);
   if (!store) {
     const hostObject = getHostObject(key);
+    if (!hostObject) {
+      throw new Error(
+        `[Brownie] Store "${key}" not found. ` +
+          `Make sure to register it on the native side before accessing it from JS.\n\n` +
+          `Swift example:\n` +
+          `  ${key}.register(${key}(...))\n\n` +
+          `This should be called before React Native starts.`
+      );
+    }
     store = {
       hostObject,
-      snapshot: hostObject?.unbox?.() ?? {},
+      snapshot: hostObject.unbox?.() ?? {},
       listeners: new Set(),
     };
     stores.set(key, store);
@@ -83,7 +94,6 @@ export function setState<K extends keyof BrownieStores>(
   action: SetStateAction<BrownieStores[K]>
 ): void {
   const store = getOrCreateStore(key as string);
-  if (!store.hostObject) return;
 
   const partial =
     typeof action === 'function'

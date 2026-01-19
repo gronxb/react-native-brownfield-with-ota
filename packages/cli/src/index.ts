@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 import { styleText } from 'node:util';
 
 import { logger } from '@rock-js/tools';
@@ -28,7 +26,7 @@ program
 program
   .optionsGroup('Global options:')
   .option('--verbose', 'enable verbose logging')
-  .hook('preAction', (_cmd) => {
+  .hook('preAction', () => {
     const opts = program.opts();
     if (opts.verbose) {
       logger.setVerbose(opts.verbose ?? false);
@@ -43,7 +41,7 @@ program.configureHelp({
 });
 
 function registrationHelper(
-  commandsRegistration: Record<string, any | Command | ExampleUsage>,
+  commandsRegistration: Record<string, unknown | Command | ExampleUsage>,
   groupName: string
 ) {
   program.commandsGroup(groupName);
@@ -77,8 +75,10 @@ registrationHelper(brownieCommands, brownieCommandsGroupName);
 
 program.commandsGroup('Utility commands').helpCommand('help [command]');
 
-program.parse(process.argv);
+export function runCLI(argv: string[]): void {
+  program.parse(argv);
 
-if (!process.argv.slice(2).length) {
-  program.outputHelp();
+  if (!argv.slice(2).length) {
+    program.outputHelp();
+  }
 }

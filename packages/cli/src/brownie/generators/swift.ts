@@ -1,5 +1,5 @@
-import fs from 'fs';
-import path from 'path';
+import fs from 'node:fs';
+import path from 'node:path';
 import {
   quicktype,
   InputData,
@@ -61,6 +61,7 @@ export async function generateSwift(
     inputData,
     lang: 'swift',
     rendererOptions: {
+      'access-level': 'public',
       'mutable-properties': 'true',
       initializers: 'false',
       'swift-5-support': 'true',
@@ -74,8 +75,7 @@ extension ${typeName}: BrownieStoreProtocol {
 }
 `;
 
-  const swiftOutput =
-    'import Brownie\n\n' + lines.join('\n') + storeNameExtension;
+  const swiftOutput = lines.join('\n') + storeNameExtension;
   const absoluteOutputPath = path.resolve(process.cwd(), outputPath);
   const outputDir = path.dirname(absoluteOutputPath);
 

@@ -48,7 +48,6 @@ Add to your app's `package.json`:
 ```json
 {
   "brownie": {
-    "swift": "./ios/Generated/",
     "kotlin": "./android/app/src/main/java/com/example/",
     "kotlinPackageName": "com.example"
   }
@@ -57,11 +56,10 @@ Add to your app's `package.json`:
 
 | Field               | Required | Description                               |
 | ------------------- | -------- | ----------------------------------------- |
-| `swift`             | No\*     | Output directory for Swift files          |
-| `kotlin`            | No\*     | Output directory for Kotlin files         |
+| `kotlin`            | No       | Output directory for Kotlin files         |
 | `kotlinPackageName` | No       | Kotlin package name (extracted from path) |
 
-\*At least one of `swift` or `kotlin` is required.
+**Note:** Swift files are always generated to `node_modules/@callstack/brownie/ios/Generated/`. This path is auto-resolved and not configurable.
 
 ### Store Definition
 
@@ -110,15 +108,17 @@ declare module '@callstack/brownie' {
 
 ### Generated Output
 
-**Swift** (`Codable` struct with mutable properties):
+**Swift** (`Codable` struct with public access and mutable properties):
 
 ```swift
-struct BrownfieldStore: Codable {
-    var counter: Double
-    var isLoading: Bool
-    var user: String
+public struct BrownfieldStore: Codable {
+    public var counter: Double
+    public var isLoading: Bool
+    public var user: String
 }
 ```
+
+Generated to: `node_modules/@callstack/brownie/ios/Generated/BrownfieldStore.swift`
 
 **Kotlin** (data class):
 
@@ -185,7 +185,9 @@ packages/brownie/
 ├── ios/
 │   ├── BrownieModule.h/.mm        # TurboModule, installs JSI bindings
 │   ├── BrownieStoreBridge.h/.mm   # ObjC++ wrapper for Swift access
-│   └── BrownieStore.swift         # Swift Store<T>, StoreManager, @UseStore
+│   ├── BrownieFollyConvert.h      # FollyConvert import compatibility header
+│   ├── BrownieStore.swift         # Swift Store<T>, StoreManager, @UseStore
+│   └── Generated/                 # Auto-generated Swift store types (codegen output)
 ```
 
 ### C++ Core
@@ -216,6 +218,13 @@ packages/brownie/
 
 ### iOS Bridge
 
+**BrownieFollyConvert.h** - Compatibility header for FollyConvert imports:
+
+- Handles different import paths depending on CocoaPods configuration
+- Supports static libs with header maps (default)
+- Supports `use_frameworks! :linkage => :static` setups
+- Falls back to `RCTFollyConvert.h` when available
+
 **BrownieStoreBridge** (ObjC++) - Exposes C++ to Swift:
 
 - `registerStore(withKey:)` - Create C++ store, set up notification callback
@@ -236,6 +245,11 @@ packages/brownie/
 - `get(_:)` - Get property via keypath
 - Observes `BrownieStoreUpdated` notification, rebuilds typed state from C++ snapshot
 - `deinit` removes notification observer
+
+**BrownieStoreProtocol** - Protocol for generated store types:
+
+- `storeName` - Static property with store identifier
+- `register(_:)` - Static method to register store with initial state (extension method)
 
 **StoreManager** - Swift-side registry (delegates to C++):
 
@@ -397,22 +411,3 @@ The ObjC++ bridge layer has the most room for optimization:
 - **Single-property sync** - Currently `pushStateToCxx()` serializes entire state. Could track dirty properties and only sync changed values.
 - **Lazy Swift state rebuild** - Defer `Codable` struct reconstruction until property actually accessed.
 - **Direct C++ ↔ Swift interop** - Swift 5.9+ has experimental C++ interop that could bypass ObjC++ bridge entirely.
-
-## Auto-generation Hooks
-
-### iOS (Podfile)
-
-```ruby
-pre_install do |installer|
-  system("npx", "brownie", "codegen", "-p", "swift")
-end
-```
-
-### Android (build.gradle.kts)
-
-```kotlin
-tasks.register("generateBrownfieldStore") {
-  exec { commandLine("npx", "brownie", "codegen", "-p", "kotlin") }
-}
-preBuild.dependsOn("generateBrownfieldStore")
-```

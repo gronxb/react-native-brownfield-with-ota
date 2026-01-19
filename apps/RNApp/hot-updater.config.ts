@@ -1,15 +1,15 @@
-import { s3Storage } from "@hot-updater/aws";
-import { bare } from "@hot-updater/bare";
-import { standaloneRepository } from "@hot-updater/standalone";
-import { config } from "dotenv";
-import { defineConfig } from "hot-updater";
+import { s3Storage } from '@hot-updater/aws';
+import { bare } from '@hot-updater/bare';
+import { standaloneRepository } from '@hot-updater/standalone';
+import { config } from 'dotenv';
+import { defineConfig } from 'hot-updater';
 
-config({ path: ".env.hotupdater" });
+config({ path: '.env.hotupdater' });
 
 export default defineConfig({
   build: bare({ enableHermes: true }),
   storage: s3Storage({
-    region: "auto",
+    region: 'auto',
     endpoint: process.env.R2_ENDPOINT,
     credentials: {
       accessKeyId: process.env.R2_ACCESS_KEY_ID!,
@@ -18,10 +18,10 @@ export default defineConfig({
     bucketName: process.env.R2_BUCKET_NAME!,
   }),
   database: standaloneRepository({
-    baseUrl: "http://localhost:3006/hot-updater",
+    baseUrl: 'http://localhost:3006/hot-updater',
   }),
-  updateStrategy: "appVersion",
-  compressStrategy: "tar.br",
+  updateStrategy: 'appVersion',
+  compressStrategy: 'tar.br',
   signing: {
     enabled: false,
   },

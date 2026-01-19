@@ -1,6 +1,6 @@
-const {makeMetroConfig} = require('@rnx-kit/metro-config');
+const { makeMetroConfig } = require('@rnx-kit/metro-config');
 const MetroSymlinksResolver = require('@rnx-kit/metro-resolver-symlinks');
-const path = require('path');
+const path = require('node:path');
 
 const root = path.resolve(__dirname, '..', '..');
 
