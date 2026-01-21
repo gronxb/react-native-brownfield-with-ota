@@ -155,11 +155,11 @@ class ReactNativeBrownfieldDelegate: RCTDefaultReactNativeFactoryDelegate {
       }
     }
 
-    if onBundleReload != nil {
+    if let onBundleReload {
       NotificationCenter.default.addObserver(
         self,
         selector: #selector(jsReloaded),
-        name: NSNotification.Name("RCTReloadNotification"),
+        name: NSNotification.Name("RCTTriggerReloadCommandNotification"),
         object: nil
       )
     }
