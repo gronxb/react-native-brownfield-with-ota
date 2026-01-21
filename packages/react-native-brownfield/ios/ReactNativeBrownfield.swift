@@ -167,6 +167,8 @@ class ReactNativeBrownfieldDelegate: RCTDefaultReactNativeFactoryDelegate {
 
   @objc private func jsLoaded(_ notification: Notification) {
     onBundleLoaded?()
+    onBundleLoaded = nil
+    NotificationCenter.default.removeObserver(self)
   }
 
   @objc private func jsReloaded(_ notification: Notification) {
