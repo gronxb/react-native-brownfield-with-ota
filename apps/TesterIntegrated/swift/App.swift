@@ -3,6 +3,7 @@ import ReactBrownfield
 import HotUpdater
 import SwiftUI
 import UIKit
+import React
 
 let initialState = BrownfieldStore(
   counter: 0,
@@ -18,20 +19,13 @@ let isSideBySideMode = false
 @main
 struct MyApp: App {
   init() {
-    // Set initial bundle URL
-    if let bundleURL = HotUpdater.bundleURL() {
-      print("[TesterIntegrated] HotUpdater returned initial bundle URL: \(bundleURL)")
-      ReactNativeBrownfield.shared.bundleURL = bundleURL
-    } else {
-      print("[TesterIntegrated] HotUpdater.bundleURL() returned nil, using default bundle")
-    }
-
-    // Register onBundleReload callback for HotUpdater integration
-    ReactNativeBrownfield.shared.onBundleReload = {
-      if let bundleURL = HotUpdater.bundleURL() {
-        ReactNativeBrownfield.shared.bundleURL = bundleURL
-      } else {
-      }
+    // Dynamic bundle URL - automatically resolves to latest hot update bundle on reload
+    ReactNativeBrownfield.shared.bundleURL = {
+#if DEBUG
+      RCTBundleURLProvider.sharedSettings().jsBundleURL(forBundleRoot: "index")
+#else
+      HotUpdater.bundleURL()
+#endif
     }
 
     ReactNativeBrownfield.shared.startReactNative {

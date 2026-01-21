@@ -15,13 +15,13 @@ class ReactNativeBrownfieldDelegate: RCTDefaultReactNativeFactoryDelegate {
   }
 
   public override func bundleURL() -> URL? {
+    if let provider = ReactNativeBrownfield.shared.bundleURL {
+      return provider()
+    }
+
 #if DEBUG
     return RCTBundleURLProvider.sharedSettings().jsBundleURL(forBundleRoot: entryFile)
 #else
-    if let customBundleURL = customBundleURL {
-      return customBundleURL
-    }
-
     let resourceURLComponents = bundlePath.components(separatedBy: ".")
     let withoutLast = resourceURLComponents[..<(resourceURLComponents.count - 1)]
     let resourceName = withoutLast.joined()
@@ -37,11 +37,6 @@ class ReactNativeBrownfieldDelegate: RCTDefaultReactNativeFactoryDelegate {
   private var onBundleLoaded: (() -> Void)?
   private var delegate = ReactNativeBrownfieldDelegate()
 
-  /**
-   * Callback invoked when React Native reload is triggered.
-   * Use this to update bundleURL before reload happens.
-   */
-  @objc public var onBundleReload: (() -> Void)? = nil
 
   /**
    * Path to JavaScript root.
@@ -76,14 +71,11 @@ class ReactNativeBrownfieldDelegate: RCTDefaultReactNativeFactoryDelegate {
     }
   }
   /**
-   * Custom bundle URL for direct file system access.
+   * Dynamic bundle URL provider called on every bundle load.
+   * Return a URL to load a custom bundle, or nil to use default behavior.
    * Default value: nil
    */
-  @objc public var bundleURL: URL? = nil {
-    didSet {
-      delegate.customBundleURL = bundleURL
-    }
-  }
+  @objc public var bundleURL: (() -> URL?)? = nil
   /**
    * React Native factory instance created when starting React Native.
    * Default value: nil
@@ -154,25 +146,12 @@ class ReactNativeBrownfieldDelegate: RCTDefaultReactNativeFactoryDelegate {
         )
       }
     }
-
-    if let onBundleReload {
-      NotificationCenter.default.addObserver(
-        self,
-        selector: #selector(jsReloaded),
-        name: NSNotification.Name("RCTTriggerReloadCommandNotification"),
-        object: nil
-      )
-    }
   }
 
   @objc private func jsLoaded(_ notification: Notification) {
     onBundleLoaded?()
     onBundleLoaded = nil
     NotificationCenter.default.removeObserver(self)
-  }
-
-  @objc private func jsReloaded(_ notification: Notification) {
-    onBundleReload?()
   }
 }
 
