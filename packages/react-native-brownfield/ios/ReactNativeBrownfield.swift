@@ -7,7 +7,7 @@ class ReactNativeBrownfieldDelegate: RCTDefaultReactNativeFactoryDelegate {
   var entryFile = "index"
   var bundlePath = "main.jsbundle"
   var bundle = Bundle.main
-  var customBundleURL: URL? = nil
+  var bundleURLProvider: (() -> URL?)? = nil
   // MARK: - RCTReactNativeFactoryDelegate Methods
 
   override func sourceURL(for bridge: RCTBridge) -> URL? {
@@ -15,7 +15,7 @@ class ReactNativeBrownfieldDelegate: RCTDefaultReactNativeFactoryDelegate {
   }
 
   public override func bundleURL() -> URL? {
-    if let provider = ReactNativeBrownfield.shared.bundleURL {
+    if let provider = bundleURLProvider {
       return provider()
     }
 
@@ -72,10 +72,15 @@ class ReactNativeBrownfieldDelegate: RCTDefaultReactNativeFactoryDelegate {
   }
   /**
    * Dynamic bundle URL provider called on every bundle load.
-   * Return a URL to load a custom bundle, or nil to use default behavior.
+   * When set, this overrides the default bundleURL() behavior in the delegate.
+   * Returns a URL to load a custom bundle, or nil to use default behavior.
    * Default value: nil
    */
-  @objc public var bundleURL: (() -> URL?)? = nil
+  @objc public var bundleURL: (() -> URL?)? = nil {
+    didSet {
+      delegate.bundleURLProvider = bundleURL
+    }
+  }
   /**
    * React Native factory instance created when starting React Native.
    * Default value: nil
