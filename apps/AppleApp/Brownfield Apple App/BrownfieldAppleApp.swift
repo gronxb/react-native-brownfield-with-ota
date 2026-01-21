@@ -1,6 +1,6 @@
-import BrownfieldLib
 import Brownie
 import ReactBrownfield
+import HotUpdater
 import SwiftUI
 
 class AppDelegate: NSObject, UIApplicationDelegate {
@@ -12,7 +12,14 @@ struct BrownfieldAppleApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
 
     init() {
+        // Initialize React Native with HotUpdater support
         ReactNativeBrownfield.shared.bundle = ReactNativeBundle
+
+        // Get bundle URL from HotUpdater (supports OTA updates)
+        if let bundleURL = HotUpdater.bundleURL() {
+            ReactNativeBrownfield.shared.bundleURL = bundleURL
+        }
+
         ReactNativeBrownfield.shared.startReactNative {
             print("React Native has been loaded")
         }

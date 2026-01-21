@@ -1,5 +1,6 @@
 import Brownie
 import ReactBrownfield
+import HotUpdater
 import SwiftUI
 import UIKit
 
@@ -17,8 +18,24 @@ let isSideBySideMode = false
 @main
 struct MyApp: App {
   init() {
+    // Set initial bundle URL
+    if let bundleURL = HotUpdater.bundleURL() {
+      print("[TesterIntegrated] HotUpdater returned initial bundle URL: \(bundleURL)")
+      ReactNativeBrownfield.shared.bundleURL = bundleURL
+    } else {
+      print("[TesterIntegrated] HotUpdater.bundleURL() returned nil, using default bundle")
+    }
+
+    // Register onBundleReload callback for HotUpdater integration
+    ReactNativeBrownfield.shared.onBundleReload = {
+      if let bundleURL = HotUpdater.bundleURL() {
+        ReactNativeBrownfield.shared.bundleURL = bundleURL
+      } else {
+      }
+    }
+
     ReactNativeBrownfield.shared.startReactNative {
-      print("loaded")
+      print("[TesterIntegrated] onBundleLoaded")
     }
 
     BrownfieldStore.register(initialState)

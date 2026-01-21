@@ -12,6 +12,7 @@
   "dependencies": {
     "@callstack/brownie": "*",
     "@callstack/react-native-brownfield": "*",
+    "@hot-updater/react-native": "https://pkg.pr.new/@hot-updater/react-native@795",
     "@react-navigation/native": "^7.0.15",
     "@react-navigation/native-stack": "^7.2.1",
     "react": "19.1.1",
@@ -23,6 +24,9 @@
     "@babel/core": "^7.25.2",
     "@babel/preset-env": "^7.25.3",
     "@babel/runtime": "^7.25.0",
+    "@hot-updater/aws": "https://pkg.pr.new/@hot-updater/aws@795",
+    "@hot-updater/bare": "https://pkg.pr.new/@hot-updater/bare@795",
+    "@hot-updater/standalone": "https://pkg.pr.new/@hot-updater/standalone@795",
     "@react-native-community/cli": "20.0.0",
     "@react-native-community/cli-platform-android": "20.0.0",
     "@react-native-community/cli-platform-ios": "20.0.0",
@@ -30,6 +34,8 @@
     "@react-native/metro-config": "0.82.1",
     "@react-native/typescript-config": "0.82.1",
     "@types/react": "^19.1.1",
+    "dotenv": "^16.4.5",
+    "hot-updater": "https://pkg.pr.new/hot-updater@795",
     "react-native-monorepo-config": "^0.3.2"
   },
   "engines": {

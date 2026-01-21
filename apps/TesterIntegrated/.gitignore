@@ -6,3 +6,10 @@
 !.yarn/versions
 
 build
+
+# Hot-updater artifacts
+.hot-updater/
+.hot-updater/output/
+.env.hotupdater
+# hot-updater
+.hot-updater/output

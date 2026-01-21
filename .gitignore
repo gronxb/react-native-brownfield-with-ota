@@ -82,3 +82,7 @@ secring.gpg
 
 # Typescript
 **/*.tsbuildinfo
+
+
+dist
+.xcode.env

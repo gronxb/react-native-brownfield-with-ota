@@ -1,7 +1,7 @@
 import { useStore } from '@callstack/brownie';
 import { useEffect } from 'react';
 import './BrownfieldStore.brownie';
-import { StyleSheet, Text, View, Button, TextInput } from 'react-native';
+import { StyleSheet, Text, View, Button, TextInput, Alert, Image } from 'react-native';
 
 import {
   createNativeStackNavigator,
@@ -9,32 +9,15 @@ import {
 } from '@react-navigation/native-stack';
 import ReactNativeBrownfield from '@callstack/react-native-brownfield';
 import { NavigationContainer } from '@react-navigation/native';
-
-const getRandomValue = () => Math.round(Math.random() * 255);
-const getRandomTheme = () => {
-  const primary = [getRandomValue(), getRandomValue(), getRandomValue()];
-  const secondary = [
-    255 - (primary?.[0] || 0),
-    255 - (primary?.[1] || 0),
-    255 - (primary?.[2] || 0),
-  ];
-
-  return {
-    primary: `rgb(${primary[0]}, ${primary[1]}, ${primary[2]})`,
-    secondary: `rgb(${secondary[0]}, ${secondary[1]}, ${secondary[2]})`,
-  };
-};
+import { HotUpdater } from '@hot-updater/react-native';
 
 type RootStackParamList = {
-  Home: { theme: { primary: string; secondary: string } };
+  Home: undefined;
 };
 
 type HomeScreenProps = NativeStackScreenProps<RootStackParamList, 'Home'>;
 
-const theme = getRandomTheme();
-
-function HomeScreen({ navigation, route }: HomeScreenProps) {
-  const colors = route.params?.theme || theme;
+function HomeScreen({ navigation }: HomeScreenProps) {
   const [counter, setState] = useStore('BrownfieldStore', (s) => s.counter);
   const [user] = useStore('BrownfieldStore', (s) => s.user);
 
@@ -47,14 +30,13 @@ function HomeScreen({ navigation, route }: HomeScreenProps) {
   }, [navigation]);
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.primary }]}>
-      <Text style={[styles.title, { color: colors.secondary }]}>
-        React Native Screen
-      </Text>
+    <View style={styles.container}>
+      <Text style={styles.title}>HotUpdater 2</Text>
 
-      <Text style={[styles.text, { color: colors.secondary }]}>
-        Count: {counter}
-      </Text>
+      <Text style={styles.text}>Count: {counter}</Text>
+
+
+      <Image source={require('./src/logo_favicon.png')} style={{ width: 100, height: 100 }} />
 
       <TextInput
         style={styles.input}
@@ -67,17 +49,13 @@ function HomeScreen({ navigation, route }: HomeScreenProps) {
 
       <Button
         onPress={() => setState((prev) => ({ counter: prev.counter + 1 }))}
-        color={colors.secondary}
         title="Increment"
       />
 
       <Button
         onPress={() => {
-          navigation.push('Home', {
-            theme: getRandomTheme(),
-          });
+          navigation.push('Home');
         }}
-        color={colors.secondary}
         title="Push next screen"
       />
 
@@ -89,16 +67,24 @@ function HomeScreen({ navigation, route }: HomeScreenProps) {
             ReactNativeBrownfield.popToNative(true);
           }
         }}
-        color={colors.secondary}
         title="Go back"
       />
+
+      <Button
+        onPress={() => {
+          HotUpdater.reload();
+        }}
+        title="Reload"
+      />
+
+      <Text style={styles.text}>Bundle ID: {HotUpdater.getBundleId()}</Text>
     </View>
   );
 }
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
-export default function App() {
+function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator>
@@ -108,20 +94,60 @@ export default function App() {
   );
 }
 
+export default HotUpdater.wrap({
+  baseURL: 'http://localhost:3006/hot-updater',
+  updateStrategy: 'appVersion',
+  updateMode: 'auto',
+  onNotifyAppReady: (result) => {
+    console.log('Hot-updater status:', result.status);
+    if (result.crashedBundleId) {
+      console.log('Crashed bundle ID:', result.crashedBundleId);
+    }
+  },
+  fallbackComponent: ({ progress, status }) => (
+    <View
+      style={{
+        flex: 1,
+        padding: 20,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+      }}
+    >
+      <Text style={{ color: 'white', fontSize: 20, fontWeight: 'bold' }}>
+        {status === 'UPDATING' ? 'Updating...' : 'Checking for Update...'}
+      </Text>
+      {progress > 0 ? (
+        <Text style={{ color: 'white', fontSize: 20, fontWeight: 'bold' }}>
+          {Math.round(progress * 100)}%
+        </Text>
+      ) : null}
+    </View>
+  ),
+  onError: (error) => {
+    if (error instanceof Error) {
+      Alert.alert('Update Error', error.message);
+    }
+  },
+})(App);
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: '#f5f5f5',
   },
   title: {
     fontSize: 30,
     fontWeight: 'bold',
     margin: 10,
+    color: '#333',
   },
   text: {
     fontSize: 16,
     margin: 5,
+    color: '#666',
   },
   input: {
     borderWidth: 1,

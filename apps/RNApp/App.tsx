@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { StyleSheet, Text, View, Button, Alert } from 'react-native';
+import { StyleSheet, Text, View, Button, Alert, Image } from 'react-native';
 import {
   createNativeStackNavigator,
   type NativeStackScreenProps,
@@ -39,8 +39,10 @@ function HomeScreen({ navigation, route }: Props) {
   return (
     <View style={[styles.container, { backgroundColor: colors.primary }]}>
       <Text style={[styles.text, { color: colors.secondary }]}>
-        Hot Updater 2
+        Hot Updater 3
       </Text>
+
+      <Image source={require('./src/logo_favicon.png')} style={{ width: 100, height: 100 }} />
       <Text style={[styles.text, { color: colors.secondary }]}>Brownfield</Text>
 
       <Button
@@ -64,6 +66,8 @@ function HomeScreen({ navigation, route }: Props) {
         color={colors.secondary}
         title="Go back"
       />
+
+      <Image source={require('./src/logo_favicon.png')} style={{ width: 100, height: 100 }} />
 
       <Button
         onPress={() => {
