@@ -28,12 +28,14 @@ ReactNativeBrownfield.shared
 
 #### Properties
 
-| Property           | Type      | Default         | Description                                               |
-| ------------------ | --------- | --------------- | --------------------------------------------------------- |
-| `entryFile`        | `String`  | `index`         | Path to JavaScript root.                                  |
-| `fallbackResource` | `String?` | `nil`           | Path to bundle fallback resource.                         |
-| `bundlePath`       | `String`  | `main.jsbundle` | Path to bundle fallback resource.                         |
-| `bundle`           | `Bundle`  | `Bundle.main`   | Bundle instance to lookup the JavaScript bundle resource. |
+| Property           | Type              | Default         | Description                                               |
+| ------------------ | ----------------- | --------------- | --------------------------------------------------------- |
+| `entryFile`        | `String`          | `index`         | Path to JavaScript root.                                  |
+| `fallbackResource` | `String?`         | `nil`           | Path to bundle fallback resource.                         |
+| `bundlePath`       | `String`          | `main.jsbundle` | Path to bundle fallback resource.                         |
+| `bundle`           | `Bundle`          | `Bundle.main`   | Bundle instance to lookup the JavaScript bundle resource. |
+| `bundleURL`        | `URL?`            | `nil`           | Custom bundle URL for direct file system access.          |
+| `onBundleReload`   | `(() -> Void)?`   | `nil`           | Callback invoked when React Native reload is triggered.   |
 
 ---
 

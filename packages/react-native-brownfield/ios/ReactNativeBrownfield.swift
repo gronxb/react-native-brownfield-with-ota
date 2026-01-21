@@ -7,21 +7,26 @@ class ReactNativeBrownfieldDelegate: RCTDefaultReactNativeFactoryDelegate {
   var entryFile = "index"
   var bundlePath = "main.jsbundle"
   var bundle = Bundle.main
+  var customBundleURL: URL? = nil
   // MARK: - RCTReactNativeFactoryDelegate Methods
-  
+
   override func sourceURL(for bridge: RCTBridge) -> URL? {
     return bundleURL()
   }
-  
+
   public override func bundleURL() -> URL? {
 #if DEBUG
     return RCTBundleURLProvider.sharedSettings().jsBundleURL(forBundleRoot: entryFile)
 #else
+    if let customBundleURL = customBundleURL {
+      return customBundleURL
+    }
+
     let resourceURLComponents = bundlePath.components(separatedBy: ".")
     let withoutLast = resourceURLComponents[..<(resourceURLComponents.count - 1)]
     let resourceName = withoutLast.joined()
     let fileExtension = resourceURLComponents.last ?? ""
-    
+
     return bundle.url(forResource: resourceName, withExtension: fileExtension)
 #endif
   }
@@ -31,7 +36,13 @@ class ReactNativeBrownfieldDelegate: RCTDefaultReactNativeFactoryDelegate {
   public static let shared = ReactNativeBrownfield()
   private var onBundleLoaded: (() -> Void)?
   private var delegate = ReactNativeBrownfieldDelegate()
-  
+
+  /**
+   * Callback invoked when React Native reload is triggered.
+   * Use this to update bundleURL before reload happens.
+   */
+  @objc public var onBundleReload: (() -> Void)? = nil
+
   /**
    * Path to JavaScript root.
    * Default value: "index"
@@ -62,6 +73,15 @@ class ReactNativeBrownfieldDelegate: RCTDefaultReactNativeFactoryDelegate {
   @objc public var bundle: Bundle = Bundle.main {
     didSet {
       delegate.bundle = bundle
+    }
+  }
+  /**
+   * Custom bundle URL for direct file system access.
+   * Default value: nil
+   */
+  @objc public var bundleURL: URL? = nil {
+    didSet {
+      delegate.customBundleURL = bundleURL
     }
   }
   /**
@@ -112,10 +132,10 @@ class ReactNativeBrownfieldDelegate: RCTDefaultReactNativeFactoryDelegate {
    */
   @objc public func startReactNative(onBundleLoaded: (() -> Void)?, launchOptions: [AnyHashable: Any]?) {
     guard reactNativeFactory == nil else { return }
-    
+
     delegate.dependencyProvider = RCTAppDependencyProvider()
     self.reactNativeFactory = RCTReactNativeFactory(delegate: delegate)
-    
+
     if let onBundleLoaded {
       self.onBundleLoaded = onBundleLoaded
       if RCTIsNewArchEnabled() {
@@ -134,12 +154,25 @@ class ReactNativeBrownfieldDelegate: RCTDefaultReactNativeFactoryDelegate {
         )
       }
     }
+
+    if let onBundleReload {
+      NotificationCenter.default.addObserver(
+        self,
+        selector: #selector(jsReloaded),
+        name: NSNotification.Name("RCTTriggerReloadCommandNotification"),
+        object: nil
+      )
+    }
   }
-  
+
   @objc private func jsLoaded(_ notification: Notification) {
     onBundleLoaded?()
     onBundleLoaded = nil
     NotificationCenter.default.removeObserver(self)
+  }
+
+  @objc private func jsReloaded(_ notification: Notification) {
+    onBundleReload?()
   }
 }
 
